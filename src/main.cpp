@@ -59,9 +59,9 @@ void setup() {
     Serial.println("❌ Gagal mendeteksi sensor fingerprint.");
   }
 
-  tampilkanMenuUtama();
+  tampilkanMenuUtama(); // Fungsi original untuk Serial Monitor
   // ✅ TAMBAHAN BARU - Tampilkan menu utama di LCD juga
-  tampilkanMenuUtama(); // Untuk LCD TFT
+  tampilkanMenuUtamaLCD(); // Untuk LCD TFT - NAMA FUNGSI DIUBAH
 }
 
 void loop() {
@@ -91,9 +91,9 @@ void loop() {
         tombolDitekan = false;
       }
       if (key == 'B') {
-        tampilkanMenuUtama();
+        tampilkanMenuUtama(); // Serial Monitor
         // ✅ TAMBAHAN BARU - Update LCD juga saat kembali ke menu
-        tampilkanMenuUtama(); // Untuk LCD TFT
+        tampilkanMenuUtamaLCD(); // LCD TFT - NAMA FUNGSI DIUBAH
         return;
       }
     }
@@ -234,9 +234,9 @@ void loop() {
         Serial.println("🧠 Verifikasi sidik jari admin...");
         currentState = VERIFIKASI_ADMIN_EDIT;
       } else if (key == 'B') {
-        tampilkanMenuUtama();
+        tampilkanMenuUtama(); // Serial Monitor
         // ✅ TAMBAHAN BARU - Update LCD juga saat kembali ke menu
-        tampilkanMenuUtama(); // Untuk LCD TFT
+        tampilkanMenuUtamaLCD(); // LCD TFT - NAMA FUNGSI DIUBAH
       }
       return;
 

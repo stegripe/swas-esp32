@@ -27,10 +27,10 @@ extern Adafruit_ILI9341 tft;
 void initDisplay();
 
 // Fungsi untuk clear screen dengan cara overwrite text hitam
-void clearScreen();
+void clearLCDScreen();
 
-// Fungsi untuk menampilkan menu utama
-void tampilkanMenuUtama();
+// Fungsi untuk menampilkan menu utama di LCD - NAMA DIUBAH UNTUK MENGHINDARI CONFLICT
+void tampilkanMenuUtamaLCD();
 
 // Fungsi helper untuk print text dengan posisi dan size
 void printText(int x, int y, int size, const char* text, uint16_t color = COLOR_TEXT);
