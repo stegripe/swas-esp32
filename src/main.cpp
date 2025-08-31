@@ -10,6 +10,7 @@
 #include "admin_handler.h"
 #include "wifi_manager.h" // Sudah ada
 #include "ntp_manager.h"  // <--- Tambahkan ini
+#include "display_manager.h"  // ✅ TAMBAHAN BARU - Include display manager
 
 HardwareSerial mySerial(2);
 Adafruit_Fingerprint finger = Adafruit_Fingerprint(&mySerial);
@@ -28,6 +29,9 @@ void setup() {
   Wire.begin(21, 22);
   keyPad.begin();
   keyPad.setDebounceThreshold(50);
+
+  // ✅ TAMBAHAN BARU - Inisialisasi LCD TFT
+  initDisplay();
 
   // Inisialisasi WiFi
   setupWiFi(WIFI_SSID, WIFI_PASSWORD); // Panggil fungsi setup WiFi
@@ -56,6 +60,8 @@ void setup() {
   }
 
   tampilkanMenuUtama();
+  // ✅ TAMBAHAN BARU - Tampilkan menu utama di LCD juga
+  tampilkanMenuUtama(); // Untuk LCD TFT
 }
 
 void loop() {
@@ -86,6 +92,8 @@ void loop() {
       }
       if (key == 'B') {
         tampilkanMenuUtama();
+        // ✅ TAMBAHAN BARU - Update LCD juga saat kembali ke menu
+        tampilkanMenuUtama(); // Untuk LCD TFT
         return;
       }
     }
@@ -227,6 +235,8 @@ void loop() {
         currentState = VERIFIKASI_ADMIN_EDIT;
       } else if (key == 'B') {
         tampilkanMenuUtama();
+        // ✅ TAMBAHAN BARU - Update LCD juga saat kembali ke menu
+        tampilkanMenuUtama(); // Untuk LCD TFT
       }
       return;
 
