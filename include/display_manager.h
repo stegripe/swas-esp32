@@ -5,7 +5,6 @@
 #include <SPI.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_ILI9341.h>
-#include "display_texts.h"
 
 // Pin definitions untuk LCD TFT
 #define TFT_DC 4
@@ -26,7 +25,7 @@ extern Adafruit_ILI9341 tft;
 // Fungsi inisialisasi
 void initDisplay();
 
-// Fungsi untuk clear screen dengan cara overwrite text hitam
+// Fungsi untuk clear screen dengan fillScreen method
 void clearLCDScreen();
 
 // ✅ FUNGSI BARU - Clear menu utama secara spesifik
