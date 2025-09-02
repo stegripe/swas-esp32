@@ -3,6 +3,7 @@
 #include "input_handler.h"
 #include "admin_handler.h"
 #include "fingerprint_manager.h"  // ✅ Tambahan agar bisa panggil handleVerifikasiAdmin()
+#include "display_manager.h"      // ✅ TAMBAHAN BARU - Include display manager untuk clear LCD
 #include <Arduino.h>
 
 extern bool modeAlfabet;  // ← dibutuhkan agar bisa set alfabet default
@@ -21,6 +22,9 @@ void tampilkanMenuUtama() {
 
 // Fungsi: Eksekusi pilihan berdasarkan input menu
 void eksekusiPilihanMenu() {
+  // ✅ TAMBAHAN BARU - Clear LCD screen sebelum masuk ke menu pilihan
+  clearLCDScreen();
+  
   if (selectedMenu == "3") {
     mulaiPendaftaranMahasiswa();
     return;

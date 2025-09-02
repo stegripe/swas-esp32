@@ -92,7 +92,9 @@ void loop() {
       }
       if (key == 'B') {
         tampilkanMenuUtama(); // Serial Monitor
-        // ✅ TAMBAHAN BARU - Update LCD juga saat kembali ke menu
+        // ✅ TAMBAHAN BARU - Clear screen dan tampilkan menu utama di LCD
+        clearLCDScreen();  // Clear dulu
+        delay(10);         // Sedikit delay untuk memastikan clear selesai
         tampilkanMenuUtamaLCD(); // LCD TFT - NAMA FUNGSI DIUBAH
         return;
       }
@@ -235,7 +237,9 @@ void loop() {
         currentState = VERIFIKASI_ADMIN_EDIT;
       } else if (key == 'B') {
         tampilkanMenuUtama(); // Serial Monitor
-        // ✅ TAMBAHAN BARU - Update LCD juga saat kembali ke menu
+        // ✅ TAMBAHAN BARU - Clear screen dan tampilkan menu utama di LCD
+        clearLCDScreen();  // Clear dulu
+        delay(10);         // Sedikit delay untuk memastikan clear selesai
         tampilkanMenuUtamaLCD(); // LCD TFT - NAMA FUNGSI DIUBAH
       }
       return;
