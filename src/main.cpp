@@ -21,8 +21,8 @@ unsigned long tombolDitekanMulai = 0;
 
 // Definisikan SSID dan Password WiFi Anda di sini
 // Ganti dengan kredensial WiFi yang sesuai sebelum mengunggah ke ESP32 Anda
-const char* WIFI_SSID = "Makan bang";     // Ganti dengan SSID WiFi Anda
-const char* WIFI_PASSWORD = "asdqwe123"; // Ganti dengan Password WiFi Anda
+const char* WIFI_SSID = "Bor's Family";     // Ganti dengan SSID WiFi Anda
+const char* WIFI_PASSWORD = "Yogarafi@66"; // Ganti dengan Password WiFi Anda
 
 void setup() {
   Serial.begin(115200);
