@@ -93,7 +93,7 @@ void loop() {
       if (key == 'B') {
         tampilkanMenuUtama(); // Serial Monitor
         // ✅ TAMBAHAN BARU - Clear screen dan tampilkan menu utama di LCD
-        clearLCDScreen();  // Clear dulu
+        clearMenuUtamaLCD();  // Clear dulu
         delay(10);         // Sedikit delay untuk memastikan clear selesai
         tampilkanMenuUtamaLCD(); // LCD TFT - NAMA FUNGSI DIUBAH
         return;
@@ -223,6 +223,31 @@ void loop() {
         commitLastChar();
         modeAlfabet = false;
         selectedMenu = key;
+        
+        // ✅ TAMBAHAN BARU - Clear LCD dan tampilkan pesan loading ketika memilih menu 1-5
+        switch(key) {
+          case '1':
+            clearMenuUtamaLCD();
+            tampilkanPesanTransisi("Loading Absen Masuk...");
+            break;
+          case '2':
+            clearMenuUtamaLCD();
+            tampilkanPesanTransisi("Loading Absen Pulang...");
+            break;
+          case '3':
+            clearMenuUtamaLCD();
+            tampilkanPesanTransisi("Loading Pendaftaran...");
+            break;
+          case '4':
+            clearMenuUtamaLCD();
+            tampilkanPesanTransisi("Loading Admin...");
+            break;
+          case '5':
+            clearMenuUtamaLCD();
+            tampilkanPesanTransisi("Loading Edit User...");
+            break;
+        }
+        
         eksekusiPilihanMenu();
         return;
       }
@@ -238,7 +263,7 @@ void loop() {
       } else if (key == 'B') {
         tampilkanMenuUtama(); // Serial Monitor
         // ✅ TAMBAHAN BARU - Clear screen dan tampilkan menu utama di LCD
-        clearLCDScreen();  // Clear dulu
+        clearMenuUtamaLCD();  // Clear dulu
         delay(10);         // Sedikit delay untuk memastikan clear selesai
         tampilkanMenuUtamaLCD(); // LCD TFT - NAMA FUNGSI DIUBAH
       }
@@ -246,21 +271,53 @@ void loop() {
 
     case ISI_DATA:
     case KONFIRMASI_DATA:
+      // ✅ TAMBAHAN BARU - Jika tombol B di form pendaftaran mahasiswa
+      if (key == 'B' && (currentState == ISI_DATA || currentState == KONFIRMASI_DATA)) {
+        tampilkanMenuUtama(); // Serial Monitor
+        clearMenuUtamaLCD();  // Clear dulu
+        delay(10);
+        tampilkanMenuUtamaLCD(); // LCD TFT
+        return;
+      }
       handleInputFormMahasiswa(key);
       return;
 
     case ISI_DATA_ADMIN:
     case KONFIRMASI_ADMIN:
+      // ✅ TAMBAHAN BARU - Jika tombol B di form pendaftaran admin
+      if (key == 'B' && (currentState == ISI_DATA_ADMIN || currentState == KONFIRMASI_ADMIN)) {
+        tampilkanMenuUtama(); // Serial Monitor
+        clearMenuUtamaLCD();  // Clear dulu
+        delay(10);
+        tampilkanMenuUtamaLCD(); // LCD TFT
+        return;
+      }
       handleInputFormAdmin(key);
       return;
 
     case EDIT_DATA_MHS:
     case KONFIRMASI_EDIT_MHS:
+      // ✅ TAMBAHAN BARU - Jika tombol B di form edit mahasiswa
+      if (key == 'B' && (currentState == EDIT_DATA_MHS || currentState == KONFIRMASI_EDIT_MHS)) {
+        tampilkanMenuUtama(); // Serial Monitor
+        clearMenuUtamaLCD();  // Clear dulu
+        delay(10);
+        tampilkanMenuUtamaLCD(); // LCD TFT
+        return;
+      }
       handleInputEditMahasiswa(key);
       return;
 
     case EDIT_DATA_ADMIN:
     case KONFIRMASI_EDIT_ADMIN:
+      // ✅ TAMBAHAN BARU - Jika tombol B di form edit admin
+      if (key == 'B' && (currentState == EDIT_DATA_ADMIN || currentState == KONFIRMASI_EDIT_ADMIN)) {
+        tampilkanMenuUtama(); // Serial Monitor
+        clearMenuUtamaLCD();  // Clear dulu
+        delay(10);
+        tampilkanMenuUtamaLCD(); // LCD TFT
+        return;
+      }
       handleInputEditAdmin(key);
       return;
   }

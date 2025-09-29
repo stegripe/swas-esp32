@@ -1,33 +1,5 @@
 #include "display_manager.h"
-
-// ================================
-// DEFINISI VARIABLE TEKS - IMPLEMENTASI
-// ================================
-
-// Header menu utama
-const char* MENU_HEADER_LINE = "==========================";
-const char* MENU_TITLE_LINE1 = " Smart Workspace";
-const char* MENU_TITLE_LINE2 = "Attendance System";
-
-// Menu options
-const char* MENU_OPTION_1 = "1. Absen Masuk";
-const char* MENU_OPTION_2 = "2. Absen Pulang";
-const char* MENU_OPTION_3 = "3. Mendaftar Sidik";
-const char* MENU_OPTION_3_SUB = "   Jari Mahasiswa";
-const char* MENU_OPTION_4 = "4. Mendaftar Admin";
-const char* MENU_OPTION_5 = "5. Ganti Informasi User";
-
-// Layout untuk menu utama
-const TextLayout LAYOUT_HEADER_TOP = {0, 0, 2};
-const TextLayout LAYOUT_TITLE_1 = {0, 20, 3};
-const TextLayout LAYOUT_TITLE_2 = {0, 50, 3};
-const TextLayout LAYOUT_HEADER_BOTTOM = {0, 80, 2};
-const TextLayout LAYOUT_OPTION_1 = {0, 100, 2};
-const TextLayout LAYOUT_OPTION_2 = {0, 120, 2};
-const TextLayout LAYOUT_OPTION_3 = {0, 140, 2};
-const TextLayout LAYOUT_OPTION_3_SUB = {0, 160, 2};
-const TextLayout LAYOUT_OPTION_4 = {0, 180, 2};
-const TextLayout LAYOUT_OPTION_5 = {0, 200, 2};
+#include "display_texts.h"
 
 // Inisialisasi object LCD TFT
 Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC, TFT_MOSI, TFT_SCK, TFT_RST, TFT_MISO);
@@ -68,7 +40,6 @@ void clearLCDScreen() {
     printText(LAYOUT_OPTION_5.x, LAYOUT_OPTION_5.y, LAYOUT_OPTION_5.size, MENU_OPTION_5, COLOR_CLEAR);
 }
 
-// ✅ BARU - Fungsi khusus untuk clear menu utama saja (sama dengan clearLCDScreen tapi nama berbeda untuk clarity)
 void clearMenuUtamaLCD() {
     // Clear dengan cara overwrite text dengan warna hitam - menu utama
     // Header top
@@ -108,4 +79,13 @@ void tampilkanMenuUtamaLCD() {
     printText(LAYOUT_OPTION_3_SUB.x, LAYOUT_OPTION_3_SUB.y, LAYOUT_OPTION_3_SUB.size, MENU_OPTION_3_SUB);
     printText(LAYOUT_OPTION_4.x, LAYOUT_OPTION_4.y, LAYOUT_OPTION_4.size, MENU_OPTION_4);
     printText(LAYOUT_OPTION_5.x, LAYOUT_OPTION_5.y, LAYOUT_OPTION_5.size, MENU_OPTION_5);
+}
+
+void tampilkanPesanTransisi(const char* pesan) {
+    // Clear screen dulu
+    clearMenuUtamaLCD();
+    
+    // Tampilkan pesan loading/transisi di tengah layar
+    printText(10, 120, 2, pesan);
+    delay(500); // Tunda sebentar untuk transisi yang smooth
 }

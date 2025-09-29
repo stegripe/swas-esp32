@@ -29,7 +29,7 @@ void initDisplay();
 // Fungsi untuk clear screen dengan cara overwrite text hitam
 void clearLCDScreen();
 
-// ✅ FUNGSI BARU - Clear menu utama secara spesifik
+// Fungsi untuk clear menu utama secara spesifik
 void clearMenuUtamaLCD();
 
 // Fungsi untuk menampilkan menu utama di LCD
@@ -38,7 +38,7 @@ void tampilkanMenuUtamaLCD();
 // Fungsi helper untuk print text dengan posisi dan size
 void printText(int x, int y, int size, const char* text, uint16_t color = COLOR_TEXT);
 
-// ✅ FUNGSI BARU - Tampilkan pesan loading/transisi
+// Fungsi untuk tampilkan pesan loading/transisi
 void tampilkanPesanTransisi(const char* pesan);
 
 #endif
