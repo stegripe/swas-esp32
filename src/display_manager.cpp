@@ -4,9 +4,6 @@
 // Inisialisasi object LCD TFT
 Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC, TFT_MOSI, TFT_SCK, TFT_RST, TFT_MISO);
 
-// Inisialisasi object Touchscreen
-Adafruit_FT6206 touch = Adafruit_FT6206();
-
 void initDisplay() {
     Serial.println("Inisialisasi LCD TFT...");
     tft.begin();

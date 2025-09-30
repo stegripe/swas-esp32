@@ -13,7 +13,7 @@
 #include "display_manager.h"  // ✅ TAMBAHAN BARU - Include display manager
 #include "storage_manager.h"
 #include "api_client.h"
-#include "touch_gui.h"  // ✅ TAMBAHAN BARU - Include touch GUI
+#include "advanced_gui.h"  // ✅ TAMBAHAN BARU - Include advanced GUI
 
 HardwareSerial mySerial(2);
 Adafruit_Fingerprint finger = Adafruit_Fingerprint(&mySerial);
@@ -36,8 +36,8 @@ void setup() {
   // ✅ TAMBAHAN BARU - Inisialisasi LCD TFT
   initDisplay();
   
-  // ✅ TAMBAHAN BARU - Inisialisasi Touch GUI
-  initTouchGUI();
+  // ✅ TAMBAHAN BARU - Inisialisasi Advanced GUI
+  initAdvancedGUI();
   
   // ✅ TAMBAHAN BARU - Tampilkan startup sequence
   showStartupSequence();
@@ -68,40 +68,58 @@ void setup() {
   }
 
   tampilkanMenuUtama(); // Fungsi original untuk Serial Monitor
-  // ✅ TAMBAHAN BARU - Tampilkan menu utama di LCD juga
-  tampilkanMenuUtamaLCD(); // Untuk LCD TFT - NAMA FUNGSI DIUBAH
-  // ✅ TAMBAHAN BARU - Tampilkan menu utama di Touch GUI
-  showMainMenuScreen(); // Untuk Touch GUI
+  // ✅ TAMBAHAN BARU - Tampilkan menu utama di Advanced GUI
+  showMainMenuScreen(); // Untuk Advanced GUI
   
   // ✅ TAMBAHAN BARU - Update status bar with system info
-  if (touchGUI) {
+  if (advancedGUI) {
     bool wifiConnected = (WiFi.status() == WL_CONNECTED);
-    touchGUI->updateStatusBar("System Ready", wifiConnected, 85);
+    advancedGUI->updateStatus("System Ready", wifiConnected, 85);
   }
 }
 
 void loop() {
   handleWiFi(); // Panggil fungsi untuk memantau dan mengelola koneksi WiFi
   
-  // ✅ TAMBAHAN BARU - Update Touch GUI
-  if (touchGUI) {
-    touchGUI->update();
+  // ✅ TAMBAHAN BARU - Update Advanced GUI
+  if (advancedGUI) {
+    advancedGUI->update();
   }
   
   // ✅ TAMBAHAN BARU - Check for state changes and update screen instantly
-  static State lastState = ABSEN;
+  static State lastState = MENU_UTAMA;
   if (currentState != lastState) {
-    onStateChanged();
+    // Update screen based on new state
+    switch (currentState) {
+      case MENU_UTAMA:
+        showMainMenuScreen();
+        break;
+      case ABSEN:
+        showAttendanceScreen();
+        break;
+      case ISI_DATA:
+        showRegistrationScreen();
+        break;
+      case ISI_DATA_ADMIN:
+        showAdminScreen();
+        break;
+      case SUBMENU_EDIT_USER:
+        showSettingsScreen();
+        break;
+      default:
+        showMainMenuScreen();
+        break;
+    }
     lastState = currentState;
   }
   
   // ✅ TAMBAHAN BARU - Update status bar with real-time info
   static unsigned long lastStatusUpdate = 0;
   if (millis() - lastStatusUpdate > 5000) { // Update every 5 seconds
-    if (touchGUI) {
+    if (advancedGUI) {
       bool wifiConnected = (WiFi.status() == WL_CONNECTED);
       String statusMsg = wifiConnected ? "Connected" : "Disconnected";
-      touchGUI->updateStatusBar(statusMsg, wifiConnected, 85);
+      advancedGUI->updateStatus(statusMsg, wifiConnected, 85);
     }
     lastStatusUpdate = millis();
   }
@@ -113,6 +131,13 @@ void loop() {
   if (currentState == ABSEN) {
     handleAbsenLoop();
     return;
+  }
+
+  // ✅ TAMBAHAN BARU - Handle keypad input for GUI navigation
+  uint8_t keyIndex = keyPad.getKey();
+  if (keyIndex < 16) {
+    char key = keys[keyIndex];
+    handleGUIKeypad(key);
   }
 
   if (currentState == VERIFIKASI_ADMIN) {
@@ -131,10 +156,8 @@ void loop() {
       }
       if (key == 'B') {
         tampilkanMenuUtama(); // Serial Monitor
-        // ✅ TAMBAHAN BARU - Clear screen dan tampilkan menu utama di LCD
-        clearMenuUtamaLCD();  // Clear dulu
-        delay(10);         // Sedikit delay untuk memastikan clear selesai
-        tampilkanMenuUtamaLCD(); // LCD TFT - NAMA FUNGSI DIUBAH
+        // ✅ TAMBAHAN BARU - Show main menu in Advanced GUI
+        showMainMenuScreen();
         return;
       }
     }
