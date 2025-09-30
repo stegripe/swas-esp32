@@ -38,14 +38,27 @@ extern Admin admin;
 extern String* currentField;
 extern String* currentAdminField;
 extern int fieldIndex;
+extern String inputText;
 
 // === Fingerprint ID Tracking ===
 extern uint16_t nextFingerID;
 extern uint16_t nextMahasiswaFingerID;
 extern uint16_t nextAdminFingerID;
 extern std::vector<uint16_t> daftarAdminIDs;
+extern std::vector<uint16_t> daftarMahasiswaIDs;
 extern std::vector<Admin> daftarAdminData;
 extern std::vector<Mahasiswa> daftarMahasiswaData;
+extern std::vector<FingerprintRecord> daftarFingerprintRecords;
+
+// === Editing Context ===
+extern int indeksMahasiswaEdit;
+extern int indeksAdminEdit;
+extern uint32_t currentMahasiswaUserId;
+extern uint32_t currentAdminUserId;
+extern uint16_t currentMahasiswaFingerprintId;
+extern uint16_t currentAdminFingerprintId;
+extern String currentMahasiswaEmail;
+extern String currentAdminEmail;
 
 // === Keypad Setup ===
 extern I2CKeyPad keyPad;
@@ -56,8 +69,5 @@ void tampilkanMenuUtama();
 void tampilkanFormDataMahasiswa();
 void tampilkanFormDataAdmin();
 bool enrollFingerprint(uint16_t id);
-
-extern int indeksMahasiswaEdit;
-extern int indeksAdminEdit; 
 
 #endif

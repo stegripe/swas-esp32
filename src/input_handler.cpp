@@ -141,7 +141,7 @@ void handleInputEditMahasiswa(char key) {
         if (key == 'A') {
             if (indeksMahasiswaEdit >= 0 && indeksMahasiswaEdit < daftarMahasiswaData.size()) {
                 mhs.sidikJariID = daftarMahasiswaData[indeksMahasiswaEdit].sidikJariID;
-                daftarMahasiswaData[indeksMahasiswaEdit] = mhs;
+            daftarMahasiswaData[indeksMahasiswaEdit] = mhs;
                 Serial.println("✅ Data Mahasiswa berhasil diperbarui!");
             } else {
                 Serial.println("❌ Gagal menemukan data mahasiswa untuk diperbarui.");

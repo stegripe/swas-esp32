@@ -11,6 +11,8 @@
 #include "wifi_manager.h" // Sudah ada
 #include "ntp_manager.h"  // <--- Tambahkan ini
 #include "display_manager.h"  // ✅ TAMBAHAN BARU - Include display manager
+#include "storage_manager.h"
+#include "api_client.h"
 
 HardwareSerial mySerial(2);
 Adafruit_Fingerprint finger = Adafruit_Fingerprint(&mySerial);
@@ -33,6 +35,9 @@ void setup() {
   // ✅ TAMBAHAN BARU - Inisialisasi LCD TFT
   initDisplay();
 
+  initStorage();
+  loadPersistentState();
+
   // Inisialisasi WiFi
   setupWiFi(WIFI_SSID, WIFI_PASSWORD); // Panggil fungsi setup WiFi
 
@@ -50,11 +55,7 @@ void setup() {
 
   if (finger.verifyPassword()) {
     Serial.println("✅ Sensor sidik jari terdeteksi.");
-    if (finger.emptyDatabase() == FINGERPRINT_OK) { //
-      Serial.println("🧹 Semua data fingerprint dihapus dari sensor.");
-    } else {
-      Serial.println("❌ Gagal menghapus data fingerprint.");
-    }
+    ensureFingerprintTemplatesSynced();
   } else {
     Serial.println("❌ Gagal mendeteksi sensor fingerprint.");
   }
