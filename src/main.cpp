@@ -13,6 +13,7 @@
 #include "display_manager.h"  // ✅ TAMBAHAN BARU - Include display manager
 #include "storage_manager.h"
 #include "api_client.h"
+#include "touch_gui.h"  // ✅ TAMBAHAN BARU - Include touch GUI
 
 HardwareSerial mySerial(2);
 Adafruit_Fingerprint finger = Adafruit_Fingerprint(&mySerial);
@@ -34,6 +35,12 @@ void setup() {
 
   // ✅ TAMBAHAN BARU - Inisialisasi LCD TFT
   initDisplay();
+  
+  // ✅ TAMBAHAN BARU - Inisialisasi Touch GUI
+  initTouchGUI();
+  
+  // ✅ TAMBAHAN BARU - Tampilkan startup sequence
+  showStartupSequence();
 
   initStorage();
   loadPersistentState();
@@ -63,10 +70,41 @@ void setup() {
   tampilkanMenuUtama(); // Fungsi original untuk Serial Monitor
   // ✅ TAMBAHAN BARU - Tampilkan menu utama di LCD juga
   tampilkanMenuUtamaLCD(); // Untuk LCD TFT - NAMA FUNGSI DIUBAH
+  // ✅ TAMBAHAN BARU - Tampilkan menu utama di Touch GUI
+  showMainMenuScreen(); // Untuk Touch GUI
+  
+  // ✅ TAMBAHAN BARU - Update status bar with system info
+  if (touchGUI) {
+    bool wifiConnected = (WiFi.status() == WL_CONNECTED);
+    touchGUI->updateStatusBar("System Ready", wifiConnected, 85);
+  }
 }
 
 void loop() {
   handleWiFi(); // Panggil fungsi untuk memantau dan mengelola koneksi WiFi
+  
+  // ✅ TAMBAHAN BARU - Update Touch GUI
+  if (touchGUI) {
+    touchGUI->update();
+  }
+  
+  // ✅ TAMBAHAN BARU - Check for state changes and update screen instantly
+  static State lastState = ABSEN;
+  if (currentState != lastState) {
+    onStateChanged();
+    lastState = currentState;
+  }
+  
+  // ✅ TAMBAHAN BARU - Update status bar with real-time info
+  static unsigned long lastStatusUpdate = 0;
+  if (millis() - lastStatusUpdate > 5000) { // Update every 5 seconds
+    if (touchGUI) {
+      bool wifiConnected = (WiFi.status() == WL_CONNECTED);
+      String statusMsg = wifiConnected ? "Connected" : "Disconnected";
+      touchGUI->updateStatusBar(statusMsg, wifiConnected, 85);
+    }
+    lastStatusUpdate = millis();
+  }
 
   if (modeAlfabet && lastKeyPressed != '\0' && (millis() - lastPressTime > ALPHABET_TIMEOUT)) {
     commitLastChar();

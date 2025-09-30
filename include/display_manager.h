@@ -5,6 +5,7 @@
 #include <SPI.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_ILI9341.h>
+#include <Adafruit_FT6206.h>
 #include "display_texts.h"
 
 // Pin definitions untuk LCD TFT
@@ -22,6 +23,9 @@
 
 // Global LCD object
 extern Adafruit_ILI9341 tft;
+
+// Global touchscreen object
+extern Adafruit_FT6206 touch;
 
 // Fungsi inisialisasi
 void initDisplay();
