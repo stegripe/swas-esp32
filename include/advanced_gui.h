@@ -74,13 +74,29 @@ public:
     void showMessageScreen(String title, String message);
     void showProgressBar(int x, int y, int width, int height, int progress, uint16_t color = COLOR_PRIMARY);
     
+    // User registration forms
+    void showStudentRegistrationForm();
+    void showAdminRegistrationForm();
+    void showFingerprintEnrollmentScreen(String userType);
+    void showRegistrationSuccessScreen(String userType, String userName);
+    void showRegistrationErrorScreen(String error);
+    
     // Status updates
     void updateStatus(String status, bool wifi = false, int battery = 100);
     void showSystemStatus(String message, bool isError = false);
     
+    // Form handling
+    void handleFormInput(char key);
+    void handleFingerprintEnrollment(char key);
+    void handleFormConfirmation(char key);
+    bool validateForm();
+    void proceedToFingerprintEnrollment();
+    
 private:
     void drawButton(int x, int y, int width, int height, String text, String icon, uint16_t color, bool selected);
     void drawProgressBar(int x, int y, int width, int height, int progress, uint16_t color);
+    void drawInputField(int x, int y, int width, int height, String label, String value, bool selected);
+    void drawFormField(String label, String value, int y, bool selected);
 };
 
 // Global GUI manager

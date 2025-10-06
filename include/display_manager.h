@@ -26,6 +26,14 @@ extern Adafruit_ILI9341 tft;
 // Fungsi inisialisasi
 void initDisplay();
 
+// Optimized display functions
+void clearScreenFast();
+void fillRectFast(int x, int y, int w, int h, uint16_t color);
+
+// Ultra-fast display functions using direct SPI
+void clearScreenUltraFast();
+void fillRectUltraFast(int x, int y, int w, int h, uint16_t color);
+
 // Fungsi untuk clear screen dengan cara overwrite text hitam
 void clearLCDScreen();
 

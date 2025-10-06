@@ -43,12 +43,16 @@ String currentMahasiswaEmail = "";
 String currentAdminEmail = "";
 
 void initStorage() {
+  // SPIFFS initialization kept for potential offline fallback
   if (!SPIFFS.begin(true)) {
-    Serial.println("❌ Gagal menginisialisasi SPIFFS.");
+    Serial.println("⚠️ SPIFFS tidak tersedia, menggunakan mode online saja.");
+  } else {
+    Serial.println("✅ SPIFFS tersedia untuk fallback offline.");
   }
 }
 
 void loadPersistentState() {
+  // Load only essential local state, user data now comes from API
   StaticJsonDocument<4096> doc;
   if (!SPIFFS.exists(kStorageNamespace)) {
     Serial.println("ℹ️ File data.json belum ada, menggunakan default.");
@@ -70,64 +74,12 @@ void loadPersistentState() {
   }
   file.close();
 
+  // Only load fingerprint ID counters for local sensor management
   nextFingerID = doc["nextFingerID"] | nextFingerID;
   nextMahasiswaFingerID = doc["nextMahasiswaFingerID"] | nextMahasiswaFingerID;
   nextAdminFingerID = doc["nextAdminFingerID"] | nextAdminFingerID;
 
-  daftarAdminIDs.clear();
-  daftarMahasiswaIDs.clear();
-  daftarAdminData.clear();
-  daftarMahasiswaData.clear();
-  daftarFingerprintRecords.clear();
-
-  if (const JsonArray adminArray = doc["adminIDs"].as<JsonArray>()) {
-    for (uint16_t id : adminArray) {
-      daftarAdminIDs.push_back(id);
-    }
-  }
-
-  if (const JsonArray mahasiswaArray = doc["mahasiswaIDs"].as<JsonArray>()) {
-    for (uint16_t id : mahasiswaArray) {
-      daftarMahasiswaIDs.push_back(id);
-    }
-  }
-
-  if (const JsonArray admins = doc["admins"].as<JsonArray>()) {
-    for (const JsonObject obj : admins) {
-      Admin a;
-      a.nama = obj["nama"].as<const char*>();
-      a.nik = obj["nik"].as<const char*>();
-      a.email = obj["email"].as<const char*>();
-      a.sidikJariID = obj["id"] | 0;
-      daftarAdminData.push_back(a);
-      daftarAdminIDs.push_back(a.sidikJariID);
-    }
-  }
-
-  if (const JsonArray mahasiswa = doc["mahasiswa"].as<JsonArray>()) {
-    for (const JsonObject obj : mahasiswa) {
-      Mahasiswa m;
-      m.nama = obj["nama"].as<const char*>();
-      m.nim = obj["nim"].as<const char*>();
-      m.kelas = obj["kelas"].as<const char*>();
-      m.email = obj["email"].as<const char*>();
-      m.isDosen = obj["isDosen"] | 0;
-      m.sidikJariID = obj["id"] | 0;
-      daftarMahasiswaData.push_back(m);
-      daftarMahasiswaIDs.push_back(m.sidikJariID);
-    }
-  }
-
-  if (const JsonArray fingerprints = doc["fingerprints"].as<JsonArray>()) {
-    for (const JsonObject obj : fingerprints) {
-      FingerprintRecord record;
-      record.fingerprintId = obj["fingerprintId"] | 0;
-      record.userId = obj["userId"] | 0;
-      record.isAdmin = obj["isAdmin"] | false;
-      record.isDosen = obj["isDosen"] | false;
-      daftarFingerprintRecords.push_back(record);
-    }
-  }
+  Serial.println("✅ Local state loaded, user data will be fetched from API");
 }
 
 static bool writeJsonToFile(const JsonDocument& doc) {
@@ -194,27 +146,25 @@ static void fillJsonDocument(JsonDocument& doc) {
 }
 
 void persistUsers() {
-  StaticJsonDocument<4096> doc;
-  fillJsonDocument(doc);
+  // User data now managed by API, only save local state
+  StaticJsonDocument<512> doc;
+  doc["nextFingerID"] = nextFingerID;
+  doc["nextMahasiswaFingerID"] = nextMahasiswaFingerID;
+  doc["nextAdminFingerID"] = nextAdminFingerID;
+  
   if (writeJsonToFile(doc)) {
-    Serial.println("💾 Data users tersimpan.");
+    Serial.println("💾 Local state tersimpan.");
   }
 }
 
 void persistFingerprintIds() {
-  StaticJsonDocument<4096> doc;
-  fillJsonDocument(doc);
-  if (writeJsonToFile(doc)) {
-    Serial.println("💾 Data fingerprint tersimpan.");
-  }
+  // Same as persistUsers now
+  persistUsers();
 }
 
 void persistAll() {
-  StaticJsonDocument<4096> doc;
-  fillJsonDocument(doc);
-  if (writeJsonToFile(doc)) {
-    Serial.println("💾 Seluruh data tersimpan.");
-  }
+  // Same as persistUsers now
+  persistUsers();
 }
 
 void ensureFingerprintTemplatesSynced() {

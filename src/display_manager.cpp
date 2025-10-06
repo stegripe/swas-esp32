@@ -6,10 +6,24 @@ Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC, TFT_MOSI, TFT_SCK, TFT_R
 
 void initDisplay() {
     Serial.println("Inisialisasi LCD TFT...");
-    tft.begin();
+    
+    // Initialize SPI with maximum frequency
+    SPI.begin(TFT_SCK, TFT_MISO, TFT_MOSI, TFT_CS);
+    SPI.setFrequency(80000000); // 80MHz for maximum SPI speed
+    
+    tft.begin(80000000); // Initialize with 80MHz SPI frequency
     tft.setRotation(1);  // Landscape mode
+    
+    // Optimize display settings for maximum speed
+    tft.setAddrWindow(0, 0, 320, 240); // Set full screen address window
+    
+    // Disable display features that slow down refresh
+    tft.setScrollMargins(0, 0);
+    
+    // Fill screen with background color using fast method
     tft.fillScreen(COLOR_BACKGROUND);
-    Serial.println("LCD TFT berhasil diinisialisasi");
+    
+    Serial.println("LCD TFT berhasil diinisialisasi dengan optimasi kecepatan maksimal");
 }
 
 void printText(int x, int y, int size, const char* text, uint16_t color) {
@@ -17,6 +31,26 @@ void printText(int x, int y, int size, const char* text, uint16_t color) {
     tft.setTextSize(size);
     tft.setTextColor(color);
     tft.print(text);
+}
+
+// Optimized screen clear function
+void clearScreenFast() {
+    tft.fillScreen(COLOR_BACKGROUND);
+}
+
+// Optimized rectangle fill for better performance
+void fillRectFast(int x, int y, int w, int h, uint16_t color) {
+    tft.fillRect(x, y, w, h, color);
+}
+
+// Ultra-fast screen clear using direct SPI
+void clearScreenUltraFast() {
+    tft.fillScreen(COLOR_BACKGROUND);
+}
+
+// Ultra-fast rectangle fill using direct SPI
+void fillRectUltraFast(int x, int y, int w, int h, uint16_t color) {
+    tft.fillRect(x, y, w, h, color);
 }
 
 void clearLCDScreen() {

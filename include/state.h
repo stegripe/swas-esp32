@@ -23,7 +23,9 @@ enum State {
   SUBMENU_EDIT_USER,
   VERIFIKASI_ADMIN_EDIT,     // ✅ Tambahan
   EDIT_DATA_ADMIN,           // ✅ Tambahan
-  KONFIRMASI_EDIT_ADMIN      // ✅ Tambahan
+  KONFIRMASI_EDIT_ADMIN,     // ✅ Tambahan
+  REGISTRATION_SUCCESS,      // ✅ Tambahan untuk success screen
+  REGISTRATION_ERROR         // ✅ Tambahan untuk error screen
 };
 
 // === Global State & Status ===

@@ -41,12 +41,14 @@ static bool readResponseJson(HTTPClient& http, JsonDocument& doc) {
 static void fillUserPayload(const ApiUser& user, JsonDocument& doc) {
   doc["email"] = user.email;
   doc["password"] = user.password;
-  doc["isAdmin"] = user.isAdmin ? 1 : 0;
-  doc["isDosen"] = user.isDosen ? 1 : 0;
+  doc["isAdmin"] = user.isAdmin;
+  doc["isDosen"] = user.isDosen;
   if (user.fingerprint.length()) doc["fingerprint"] = user.fingerprint;
   if (user.nim.length()) doc["nim"] = user.nim;
   if (user.nama.length()) doc["nama"] = user.nama;
-  if (user.kelas.length()) doc["kelas"] = user.kelas;
+  if (user.kelas > 0) doc["kelas"] = user.kelas;
+  if (user.createdAt.length()) doc["createdAt"] = user.createdAt;
+  if (user.updatedAt.length()) doc["updatedAt"] = user.updatedAt;
 }
 
 bool apiCreateUser(const ApiUser& user, ApiUser* created) {
@@ -79,14 +81,16 @@ bool apiCreateUser(const ApiUser& user, ApiUser* created) {
   if (created) {
     StaticJsonDocument<1024> resp;
     if (readResponseJson(http, resp)) {
-      created->id = resp["userId"] | 0;
+      created->userId = resp["userId"] | 0;
       created->fingerprint = resp["fingerprint"].as<String>();
       created->email = resp["email"].as<String>();
       created->nama = resp["nama"].as<String>();
       created->nim = resp["nim"].as<String>();
-      created->kelas = resp["kelas"].as<String>();
+      created->kelas = resp["kelas"] | 0;
       created->isAdmin = resp["isAdmin"] | 0;
       created->isDosen = resp["isDosen"] | 0;
+      created->createdAt = resp["createdAt"].as<String>();
+      created->updatedAt = resp["updatedAt"].as<String>();
     }
   }
 
@@ -120,11 +124,11 @@ bool apiGetUserByFingerprint(const String& fingerprint, ApiUser* user) {
   if (user) {
     StaticJsonDocument<2048> doc;
     if (readResponseJson(http, doc)) {
-      user->id = doc["userId"] | 0;
+      user->userId = doc["userId"] | 0;
       user->email = doc["email"].as<String>();
       user->nama = doc["nama"].as<String>();
       user->nim = doc["nim"].as<String>();
-      user->kelas = doc["kelas"].as<String>();
+      user->kelas = doc["kelas"] | 0;
       user->fingerprint = doc["fingerprint"].as<String>();
       user->isAdmin = doc["isAdmin"] | 0;
       user->isDosen = doc["isDosen"] | 0;
@@ -145,7 +149,7 @@ bool apiUpdateUser(const ApiUser& user) {
   applyCommonHeaders(http);
 
   StaticJsonDocument<1024> doc;
-  doc["userId"] = user.id;
+  doc["userId"] = user.userId;
   fillUserPayload(user, doc);
 
   String body;

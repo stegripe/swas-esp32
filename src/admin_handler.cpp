@@ -3,6 +3,7 @@
 #include "input_handler.h"
 #include "fingerprint_manager.h"
 #include "menu_handler.h"
+#include "api_client.h"
 
 extern String inputText;
 extern bool modeAlfabet;
@@ -39,10 +40,31 @@ void handleInputFormAdmin(char key) {
         return;
       }
       if (berhasil) {
-        admin.sidikJariID = nextAdminFingerID++;
-        daftarAdminIDs.push_back(admin.sidikJariID);
-        daftarAdminData.push_back(admin);
-        Serial.println("✅ Pendaftaran Admin Berhasil!");
+        // Create admin via API
+        ApiUser apiUser;
+        apiUser.nama = admin.nama;
+        apiUser.email = admin.nik + "@admin.default"; // Default email
+        apiUser.password = "default123"; // Default password
+        apiUser.isAdmin = 1;
+        apiUser.isDosen = 0;
+        apiUser.fingerprint = String(nextAdminFingerID);
+        apiUser.kelas = 0; // Default class for admin
+        apiUser.createdAt = "2024-01-01T00:00:00Z"; // Default timestamp
+        apiUser.updatedAt = "2024-01-01T00:00:00Z"; // Default timestamp
+
+        ApiUser createdUser;
+        if (apiCreateUser(apiUser, &createdUser)) {
+            admin.sidikJariID = nextAdminFingerID;
+            Serial.println("✅ Pendaftaran Admin Berhasil!");
+            Serial.println("✅ Data berhasil disimpan ke server");
+        } else {
+            Serial.println("❌ Gagal menyimpan ke server, data disimpan lokal");
+            admin.sidikJariID = nextAdminFingerID;
+            daftarAdminIDs.push_back(admin.sidikJariID);
+            daftarAdminData.push_back(admin);
+        }
+        
+        nextAdminFingerID++;
         delay(5000);
         tampilkanMenuUtama();
       } else {
@@ -160,19 +182,34 @@ void mulaiEditAdmin() {
 void handleInputEditAdmin(char key) {
   if (currentState == KONFIRMASI_EDIT_ADMIN) {
     if (key == 'A') {
-      bool updated = false;
-      for (auto& a : daftarAdminData) {
-        if (a.sidikJariID == admin.sidikJariID) {
-          a = admin;
-          updated = true;
-          break;
-        }
-      }
+      // Update admin via API
+      ApiUser apiUser;
+      apiUser.nama = admin.nama;
+      apiUser.email = admin.nik + "@admin.default"; // Default email
+      apiUser.password = "default123"; // Default password
+      apiUser.isAdmin = 1;
+      apiUser.isDosen = 0;
+      apiUser.fingerprint = String(admin.sidikJariID);
+      apiUser.userId = currentAdminUserId; // Use stored user ID
+      apiUser.kelas = 0; // Default class for admin
+      apiUser.createdAt = "2024-01-01T00:00:00Z"; // Default timestamp
+      apiUser.updatedAt = "2024-01-01T00:00:00Z"; // Default timestamp
 
-      if (updated) {
-        Serial.println("✅ Data Admin berhasil diperbarui!");
+      if (apiUpdateUser(apiUser)) {
+        Serial.println("✅ Data Admin berhasil diperbarui di server!");
       } else {
-        Serial.println("❌ Gagal menemukan data admin untuk diperbarui.");
+        Serial.println("❌ Gagal memperbarui di server, data diperbarui lokal");
+        bool updated = false;
+        for (auto& a : daftarAdminData) {
+          if (a.sidikJariID == admin.sidikJariID) {
+            a = admin;
+            updated = true;
+            break;
+          }
+        }
+        if (!updated) {
+          Serial.println("❌ Gagal menemukan data admin untuk diperbarui.");
+        }
       }
 
       delay(2000);

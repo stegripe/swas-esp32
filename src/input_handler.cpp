@@ -3,6 +3,7 @@
 #include "menu_handler.h"
 #include "fingerprint_manager.h"
 #include "admin_handler.h"
+#include "db_client.h"
 
 char lastKeyPressed = '\0';
 int pressCount = 0;
@@ -71,10 +72,24 @@ void handleInputFormMahasiswa(char key) {
 
             } while (!berhasil);
 
-            mhs.sidikJariID = nextFingerID++;
-            daftarMahasiswaData.push_back(mhs);
+            // Create student via database
+            StudentDB studentDB;
+            studentDB.nim = mhs.nim;
+            studentDB.nama = mhs.nama;
+            studentDB.kelas = mhs.kelas;
+            studentDB.fingerprints = String(nextFingerID);
 
-            Serial.println("✅ Pendaftaran Mahasiswa Berhasil!");
+            if (dbCreateStudent(studentDB)) {
+                mhs.sidikJariID = nextFingerID;
+                Serial.println("✅ Pendaftaran Mahasiswa Berhasil!");
+                Serial.println("✅ Data berhasil disimpan ke database");
+            } else {
+                Serial.println("❌ Gagal menyimpan ke database, data disimpan lokal");
+                mhs.sidikJariID = nextFingerID;
+                daftarMahasiswaData.push_back(mhs);
+            }
+            
+            nextFingerID++;
             delay(3000);
             tampilkanMenuUtama();
             return;
@@ -139,12 +154,20 @@ void handleInputFormMahasiswa(char key) {
 void handleInputEditMahasiswa(char key) {
     if (currentState == KONFIRMASI_EDIT_MHS) {
         if (key == 'A') {
-            if (indeksMahasiswaEdit >= 0 && indeksMahasiswaEdit < daftarMahasiswaData.size()) {
-                mhs.sidikJariID = daftarMahasiswaData[indeksMahasiswaEdit].sidikJariID;
-            daftarMahasiswaData[indeksMahasiswaEdit] = mhs;
-                Serial.println("✅ Data Mahasiswa berhasil diperbarui!");
+            // Update student via database
+            StudentDB studentDB;
+            studentDB.nim = mhs.nim;
+            studentDB.nama = mhs.nama;
+            studentDB.kelas = mhs.kelas;
+            studentDB.fingerprints = String(mhs.sidikJariID);
+
+            if (dbUpdateStudent(studentDB)) {
+                Serial.println("✅ Data Mahasiswa berhasil diperbarui di database!");
             } else {
-                Serial.println("❌ Gagal menemukan data mahasiswa untuk diperbarui.");
+                Serial.println("❌ Gagal memperbarui di database, data diperbarui lokal");
+                if (indeksMahasiswaEdit >= 0 && indeksMahasiswaEdit < daftarMahasiswaData.size()) {
+                    daftarMahasiswaData[indeksMahasiswaEdit] = mhs;
+                }
             }
 
             indeksMahasiswaEdit = -1;

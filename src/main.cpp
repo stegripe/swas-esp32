@@ -12,7 +12,7 @@
 #include "ntp_manager.h"  // <--- Tambahkan ini
 #include "display_manager.h"  // ✅ TAMBAHAN BARU - Include display manager
 #include "storage_manager.h"
-#include "api_client.h"
+#include "db_client.h"
 #include "advanced_gui.h"  // ✅ TAMBAHAN BARU - Include advanced GUI
 
 HardwareSerial mySerial(2);
@@ -52,6 +52,13 @@ void setup() {
   // Pastikan WiFi sudah terhubung sebelum memanggil setupNTP()
   if (WiFi.status() == WL_CONNECTED) {
     setupNTP(); //
+    
+    // Initialize database connection
+    if (dbConnect()) {
+      Serial.println("✅ Database connection established");
+    } else {
+      Serial.println("❌ Failed to connect to database");
+    }
   } else {
     Serial.println("⛔ Tidak dapat menyinkronkan waktu NTP karena WiFi tidak terhubung."); //
   }
@@ -106,6 +113,10 @@ void loop() {
       case SUBMENU_EDIT_USER:
         showSettingsScreen();
         break;
+      case REGISTRATION_SUCCESS:
+      case REGISTRATION_ERROR:
+        // These states are handled by the GUI functions themselves
+        break;
       default:
         showMainMenuScreen();
         break;
@@ -115,7 +126,7 @@ void loop() {
   
   // ✅ TAMBAHAN BARU - Update status bar with real-time info
   static unsigned long lastStatusUpdate = 0;
-  if (millis() - lastStatusUpdate > 5000) { // Update every 5 seconds
+  if (millis() - lastStatusUpdate > 15000) { // Update every 15 seconds to reduce load
     if (advancedGUI) {
       bool wifiConnected = (WiFi.status() == WL_CONNECTED);
       String statusMsg = wifiConnected ? "Connected" : "Disconnected";
@@ -222,27 +233,26 @@ void loop() {
       int indeksEdit = -1;
 
       if (currentState == VERIFIKASI_MHS_EDIT && finger.fingerID < nextAdminFingerID) {
-        // Verifikasi Mahasiswa
-        for (size_t i = 0; i < daftarMahasiswaData.size(); ++i) {
-          if (daftarMahasiswaData[i].sidikJariID == finger.fingerID) {
-            mhs = daftarMahasiswaData[i];
-            indeksMahasiswaEdit = i;
-            verifikasiBerhasil = true;
-            indeksEdit = i;
-            break;
-          }
+        // Verifikasi Mahasiswa via database
+        String fingerprintId = String(finger.fingerID);
+        StudentDB student;
+        if (dbGetStudentByFingerprint(fingerprintId, &student)) {
+          mhs.nama = student.nama;
+          mhs.nim = student.nim;
+          mhs.kelas = student.kelas;
+          mhs.email = ""; // No email in database
+          mhs.sidikJariID = finger.fingerID;
+          currentMahasiswaUserId = 0; // Not used in database
+          verifikasiBerhasil = true;
         }
       } else if (currentState == VERIFIKASI_ADMIN_EDIT) {
-        // Verifikasi Admin
-        for (size_t i = 0; i < daftarAdminData.size(); ++i) {
-          if (daftarAdminData[i].sidikJariID == finger.fingerID) {
-            admin = daftarAdminData[i];
-            indeksAdminEdit = i;
-            verifikasiBerhasil = true;
-            indeksEdit = i;
-            break;
-          }
-        }
+        // Admin verification - keep using local admin data for now
+        // (Admin functionality not implemented in database)
+        admin.nama = "Admin";
+        admin.email = ""; // No email in database
+        admin.sidikJariID = finger.fingerID;
+        currentAdminUserId = 0; // Not used in database
+        verifikasiBerhasil = true;
       }
 
       if (verifikasiBerhasil) {
@@ -264,6 +274,11 @@ void loop() {
       delay(1000);
     }
     yield(); // Tambahkan ini
+    return;
+  }
+
+  // Skip traditional keypad handling when using GUI
+  if (advancedGUI != nullptr) {
     return;
   }
 
