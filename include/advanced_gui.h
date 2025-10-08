@@ -19,6 +19,8 @@
 #define COLOR_DARK 0x0000       // Black
 #define COLOR_GRAY 0x8410       // Gray
 #define COLOR_BACKGROUND 0x0000 // Black
+#define COLOR_TEXT 0x07FF       // Cyan (same as COLOR_INFO)
+#define COLOR_CLEAR 0x0000      // Black (same as COLOR_BACKGROUND)
 #define COLOR_SELECTED 0x8410   // Gray for selected item
 
 // Menu item structure
@@ -78,6 +80,7 @@ public:
     void showStudentRegistrationForm();
     void showAdminRegistrationForm();
     void showFingerprintEnrollmentScreen(String userType);
+    void showFingerprintScanScreen(String attendanceType);
     void showRegistrationSuccessScreen(String userType, String userName);
     void showRegistrationErrorScreen(String error);
     

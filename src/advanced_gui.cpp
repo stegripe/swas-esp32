@@ -333,17 +333,15 @@ void AdvancedGUI::showAttendanceMenu() {
     clearMenu();
     
     addMenuItem("Check In", "clock", []() {
-        currentState = ABSEN;
         Serial.println("Check In selected");
-        // Start check in process
-        handleAbsenLoop();
+        // Initialize check in process - main loop will handle the rest
+        tampilkanMenuAbsenMasuk();
     }, COLOR_SUCCESS);
     
     addMenuItem("Check Out", "clock", []() {
-        currentState = ABSEN;
         Serial.println("Check Out selected");
-        // Start check out process
-        handleAbsenLoop();
+        // Initialize check out process - main loop will handle the rest
+        tampilkanMenuAbsenPulang();
     }, COLOR_WARNING);
     
     addMenuItem("Back to Main", "home", []() {
@@ -615,7 +613,9 @@ void showMainMenuScreen() {
 
 void showAttendanceScreen() {
     if (advancedGUI) {
-        advancedGUI->showAttendanceMenu();
+        // Show fingerprint scan screen instead of attendance menu
+        String attendanceType = isAbsenMasuk ? "Check In" : "Check Out";
+        advancedGUI->showFingerprintScanScreen(attendanceType);
     }
 }
 
@@ -722,6 +722,46 @@ void AdvancedGUI::showFingerprintEnrollmentScreen(String userType) {
     
     // Fingerprint icon
     drawIcon("fingerprint", 250, 100, 40, COLOR_PRIMARY);
+    
+    drawStatusBar();
+}
+
+void AdvancedGUI::showFingerprintScanScreen(String attendanceType) {
+    drawBackground();
+    drawHeader("Attendance", attendanceType);
+    
+    // Clear main content area
+    fillRectUltraFast(0, 60, 320, 160, COLOR_BACKGROUND);
+    
+    // Main message
+    tft.setTextSize(2);
+    uint16_t typeColor = (attendanceType == "Check In") ? COLOR_SUCCESS : COLOR_WARNING;
+    tft.setTextColor(typeColor);
+    int textWidth = attendanceType.length() * 12; // Approximate width
+    tft.setCursor(160 - (textWidth / 2), 80);
+    tft.print(attendanceType);
+    
+    // Instructions
+    tft.setTextSize(1);
+    tft.setTextColor(COLOR_LIGHT);
+    tft.setCursor(10, 120);
+    tft.print("Place your finger on the sensor");
+    tft.setCursor(10, 140);
+    tft.print("to record attendance");
+    tft.setCursor(10, 160);
+    tft.print("Press B to cancel");
+    
+    // Fingerprint icon
+    drawIcon("fingerprint", 250, 90, 50, typeColor);
+    
+    // Timeout indicator
+    unsigned long timeLeft = 60 - ((millis() - absenStartTime) / 1000);
+    tft.setTextSize(1);
+    tft.setTextColor(COLOR_GRAY);
+    tft.setCursor(10, 190);
+    tft.print("Timeout in: ");
+    tft.print(timeLeft);
+    tft.print("s");
     
     drawStatusBar();
 }

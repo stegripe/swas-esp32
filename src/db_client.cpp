@@ -157,12 +157,11 @@ bool dbSendAttendance(const String& nim, const String& timestamp, bool absenMasu
   cursor->execute(createTable.c_str());
 
   // Convert timestamp to MySQL DATETIME format (YYYY-MM-DD HH:MM:SS)
+  // Expected input format: "DD/MM/YYYY HH:MM"
   String mysqlTimestamp = timestamp;
-  // Ensure proper MySQL DATETIME format
-  // Expected format: "YYYY-MM-DD HH:MM:SS"
-  // If timestamp is in "DD/MM/YYYY HH:MM:SS" format, convert it
+  
   if (mysqlTimestamp.indexOf("/") != -1) {
-    // Convert from DD/MM/YYYY to YYYY-MM-DD
+    // Convert from DD/MM/YYYY HH:MM to YYYY-MM-DD HH:MM:SS
     int firstSlash = mysqlTimestamp.indexOf("/");
     int secondSlash = mysqlTimestamp.indexOf("/", firstSlash + 1);
     int spacePos = mysqlTimestamp.indexOf(" ");
@@ -173,13 +172,34 @@ bool dbSendAttendance(const String& nim, const String& timestamp, bool absenMasu
       String year = mysqlTimestamp.substring(secondSlash + 1, spacePos);
       String time = mysqlTimestamp.substring(spacePos + 1);
       
+      // Add seconds if not present (HH:MM -> HH:MM:00)
+      if (time.length() == 5 && time.indexOf(":") == 2) {
+        time += ":00";
+      }
+      
+      // Pad day and month with leading zeros if needed
+      if (day.length() == 1) day = "0" + day;
+      if (month.length() == 1) month = "0" + month;
+      
       mysqlTimestamp = year + "-" + month + "-" + day + " " + time;
+    }
+  } else if (mysqlTimestamp.indexOf("-") != -1) {
+    // Already in YYYY-MM-DD format, just ensure seconds are present
+    int spacePos = mysqlTimestamp.indexOf(" ");
+    if (spacePos != -1) {
+      String time = mysqlTimestamp.substring(spacePos + 1);
+      if (time.length() == 5 && time.indexOf(":") == 2) {
+        mysqlTimestamp += ":00";
+      }
     }
   }
   
+  Serial.println("Original timestamp: " + timestamp);
+  Serial.println("MySQL timestamp: " + mysqlTimestamp);
+  
   String query = "INSERT INTO smartworkspace.attendances (nim, type, createdAt) VALUES ('";
   query += nim + "', ";
-  query += (absenMasuk ? "1" : "2");
+  query += (absenMasuk ? "0" : "1");  // 0 = masuk, 1 = pulang
   query += ", '";
   query += mysqlTimestamp + "')";
 
@@ -237,15 +257,37 @@ bool dbCheckTodayAttendance(const String& nim, const String& date, uint8_t& last
     return false;
   }
 
-  // Extract date part from timestamp (YYYY-MM-DD format)
+  // Extract date part from timestamp and convert to MySQL format
   String dateOnly = date;
   if (date.indexOf(" ") != -1) {
     dateOnly = date.substring(0, date.indexOf(" "));
   }
+  
+  // Convert from DD/MM/YYYY to YYYY-MM-DD for MySQL
+  String mysqlDate = dateOnly;
+  if (dateOnly.indexOf("/") != -1) {
+    int firstSlash = dateOnly.indexOf("/");
+    int secondSlash = dateOnly.indexOf("/", firstSlash + 1);
+    
+    if (firstSlash != -1 && secondSlash != -1) {
+      String day = dateOnly.substring(0, firstSlash);
+      String month = dateOnly.substring(firstSlash + 1, secondSlash);
+      String year = dateOnly.substring(secondSlash + 1);
+      
+      // Pad day and month with leading zeros if needed
+      if (day.length() == 1) day = "0" + day;
+      if (month.length() == 1) month = "0" + month;
+      
+      mysqlDate = year + "-" + month + "-" + day;
+    }
+  }
+  
+  Serial.println("Original date: " + dateOnly);
+  Serial.println("MySQL date: " + mysqlDate);
 
   String query = "SELECT type FROM smartworkspace.attendances WHERE nim='";
   query += nim + "' AND DATE(createdAt) = '";
-  query += dateOnly + "' ORDER BY createdAt DESC LIMIT 1";
+  query += mysqlDate + "' ORDER BY createdAt DESC LIMIT 1";
 
   Serial.println("Executing: " + query);
   
@@ -262,7 +304,7 @@ bool dbCheckTodayAttendance(const String& nim, const String& date, uint8_t& last
       }
     }
     // No attendance found for today
-    lastType = 0;
+    lastType = 255;  // Use 255 to indicate "not found"
     Serial.println("✅ No attendance found for today");
     return true;
   } else {

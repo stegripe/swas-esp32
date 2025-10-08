@@ -2,8 +2,9 @@
 #include "menu_handler.h"
 #include "state.h"
 #include "admin_handler.h"
-#include "ntp_manager.h" // <--- Tambahkan ini
+#include "ntp_manager.h"
 #include "db_client.h"
+#include "advanced_gui.h"
 
 const int AMBANG_CONFIDENCE = 70;  // Nilai minimum confidence untuk validasi sidik jari
 
@@ -183,27 +184,65 @@ void handleAbsenLoop() {
   StudentDB student;
   if (dbGetStudentByFingerprint(fingerprintId, &student)) {
     // Check today's attendance to determine if this is masuk or pulang
+    // Type: 0 = masuk (check in), 1 = pulang (check out)
     String currentTime = getCurrentFormattedTime();
     String currentDate = getCurrentFormattedDate();
     String timestamp = currentDate + " " + currentTime;
-    uint8_t lastAttendanceType = 0;
+    uint8_t lastAttendanceType = 255;  // Use 255 as "not found" indicator
     bool isCheckIn = true; // Default to check in
     
     if (dbCheckTodayAttendance(student.nim, timestamp, lastAttendanceType)) {
-      if (lastAttendanceType == 1) {
-        // Already checked in today, this should be check out
-        isCheckIn = false;
-      } else if (lastAttendanceType == 2) {
-        // Already checked out today, this should be check in
+      Serial.print("🔍 Last attendance type: ");
+      Serial.println(lastAttendanceType);
+      
+      if (lastAttendanceType == 255) {
+        // No attendance found for today, this is check in
+        Serial.println("📝 No attendance today → CHECK IN");
         isCheckIn = true;
+      } else if (lastAttendanceType == 0) {
+        // Already checked in (masuk) today, this should be check out (pulang)
+        Serial.println("📝 Already checked in today → CHECK OUT");
+        isCheckIn = false;
+      } else if (lastAttendanceType == 1) {
+        // Already checked out (pulang) today, reject attendance
+        Serial.println("❌ Already checked out today!");
+        Serial.println("⚠️ You have completed your attendance for today");
+        Serial.println("🔙 Returning to menu...");
+        delay(3000);
+        finger.LEDcontrol(FINGERPRINT_LED_OFF, 0, FINGERPRINT_LED_BLUE);
+        tampilkanMenuUtama();
+        showMainMenuScreen();
+        sedangTampilkanData = false;
+        menungguLepasJari = false;
+        return;
       } else {
-        // No attendance today, use the original isAbsenMasuk flag
-        isCheckIn = isAbsenMasuk;
+        // Unknown attendance type, cannot safely proceed
+        Serial.println("⚠️ Unknown attendance type detected");
+        Serial.println("🔙 Returning to menu...");
+        delay(3000);
+        finger.LEDcontrol(FINGERPRINT_LED_OFF, 0, FINGERPRINT_LED_BLUE);
+        tampilkanMenuUtama();
+        showMainMenuScreen();
+        sedangTampilkanData = false;
+        menungguLepasJari = false;
+        return;
       }
     } else {
-      // If check failed, use original flag
-      isCheckIn = isAbsenMasuk;
+      // Database query failed, cannot safely determine attendance type
+      Serial.println("❌ Failed to check today's attendance from database");
+      Serial.println("⚠️ Cannot determine if this should be check in or check out");
+      Serial.println("🔙 Returning to menu to avoid duplicate entries...");
+      delay(3000);
+      finger.LEDcontrol(FINGERPRINT_LED_OFF, 0, FINGERPRINT_LED_BLUE);
+      tampilkanMenuUtama();
+      showMainMenuScreen();
+      sedangTampilkanData = false;
+      menungguLepasJari = false;
+      return;
     }
+
+    // Update global flag to match computed value for consistent messaging
+    isAbsenMasuk = isCheckIn;
 
     // Student attendance
     Serial.println(isCheckIn ? "======= Absen Masuk Berhasil =======" : "======= Absen Pulang Berhasil =======");
@@ -225,11 +264,18 @@ void handleAbsenLoop() {
       Serial.println("⚠️ Absensi dicatat lokal, gagal kirim ke database");
     }
 
-    sedangTampilkanData = true;
-    waktuTampilkanMulai = millis();
-    absenStartTime = millis();
-    menungguLepasJari = true;
+    
+    Serial.println("🔙 Kembali ke menu utama...");
+    delay(500);
     finger.LEDcontrol(FINGERPRINT_LED_OFF, 0, FINGERPRINT_LED_BLUE);
+    tampilkanMenuUtama();
+    
+    // Update GUI screen to main menu
+    showMainMenuScreen();
+    
+    sedangTampilkanData = false;
+    menungguLepasJari = false;
+    return;
   } else {
     Serial.println("❌ Fingerprint tidak ditemukan di database.");
     Serial.println("Silakan coba lagi atau hubungi admin.");

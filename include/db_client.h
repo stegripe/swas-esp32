@@ -25,7 +25,7 @@ struct StudentDB {
 struct AttendanceDB {
   uint64_t id;
   String nim;
-  uint8_t type;  // 1 = masuk, 2 = pulang
+  uint8_t type;  // 0 = masuk (check in), 1 = pulang (check out)
   String createdAt;
 };
 

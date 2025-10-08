@@ -139,16 +139,17 @@ void loop() {
     commitLastChar();
   }
 
+  // ✅ PERBAIKAN - Handle keypad input for GUI navigation SEBELUM state checks
+  // Ini penting agar GUI bisa handle input di semua state termasuk ABSEN
+  uint8_t keyIndexGUI = keyPad.getKey();
+  if (keyIndexGUI < 16 && advancedGUI != nullptr) {
+    char key = keys[keyIndexGUI];
+    handleGUIKeypad(key);
+  }
+
   if (currentState == ABSEN) {
     handleAbsenLoop();
     return;
-  }
-
-  // ✅ TAMBAHAN BARU - Handle keypad input for GUI navigation
-  uint8_t keyIndex = keyPad.getKey();
-  if (keyIndex < 16) {
-    char key = keys[keyIndex];
-    handleGUIKeypad(key);
   }
 
   if (currentState == VERIFIKASI_ADMIN) {

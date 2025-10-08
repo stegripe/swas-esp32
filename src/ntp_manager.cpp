@@ -2,9 +2,9 @@
 #include <WiFi.h> // Sertakan kembali untuk memastikan ketersediaan fungsi WiFi
 
 // Konfigurasi NTP
-const char* ntpServer = "pool.ntp.org"; // Server NTP default
-const long gmtOffset_sec = 7 * 3600;    // Offset GMT untuk WIB (GMT+7)
-const int daylightOffset_sec = 0;       // Tidak ada daylight saving di Indonesia
+const char* ntpServer = "id.pool.ntp.org"; // Indonesian NTP server pool for better accuracy
+const long gmtOffset_sec = 7 * 3600;       // WIB (UTC+7)
+const int daylightOffset_sec = 0;          // No daylight saving in Indonesia
 
 // Variabel untuk menyimpan struktur waktu
 struct tm timeinfo;
@@ -41,16 +41,26 @@ String getCurrentFormattedTime() {
   return String(time_output);
 }
 
-// Fungsi untuk mendapatkan tanggal saat ini dalam format "Hari, dd/mm/yyyy"
+// Fungsi untuk mendapatkan tanggal saat ini dalam format "dd/mm/yyyy"
 String getCurrentFormattedDate() {
   if (!getLocalTime(&timeinfo)) {
-    return "Unknown, 00/00/Unknown"; // Default jika waktu belum tersinkronisasi
+    return "01/01/2000"; // Default jika waktu belum tersinkronisasi
   }
 
-  // Perbaiki ukuran buffer date_part menjadi 11 (untuk dd/mm/yyyy + \0)
-  // Atau lebih aman, berikan sedikit kelonggaran, misal 15.
-  char date_part[15]; // Cukup untuk "dd/mm/yyyy\0" dan sedikit lebih
-  strftime(date_part, sizeof(date_part), "%d/%m/%Y", &timeinfo); // Pastikan %Y untuk tahun 4 digit
+  char date_part[15]; // Cukup untuk "dd/mm/yyyy\0"
+  strftime(date_part, sizeof(date_part), "%d/%m/%Y", &timeinfo); // Format dd/mm/yyyy
+
+  return String(date_part);
+}
+
+// Fungsi untuk mendapatkan tanggal dengan hari dalam format "Hari, dd/mm/yyyy"
+String getCurrentFormattedDateWithDay() {
+  if (!getLocalTime(&timeinfo)) {
+    return "Unknown, 01/01/2000"; // Default jika waktu belum tersinkronisasi
+  }
+
+  char date_part[15]; // Cukup untuk "dd/mm/yyyy\0"
+  strftime(date_part, sizeof(date_part), "%d/%m/%Y", &timeinfo);
 
   // Format hari
   String dayOfWeek;

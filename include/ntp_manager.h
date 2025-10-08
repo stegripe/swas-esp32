@@ -10,7 +10,10 @@ void setupNTP();
 // Fungsi untuk mendapatkan waktu saat ini dalam string
 String getCurrentFormattedTime();
 
-// Fungsi untuk mendapatkan tanggal saat ini dalam string
+// Fungsi untuk mendapatkan tanggal saat ini dalam format "dd/mm/yyyy"
 String getCurrentFormattedDate();
+
+// Fungsi untuk mendapatkan tanggal dengan hari dalam format "Hari, dd/mm/yyyy"
+String getCurrentFormattedDateWithDay();
 
 #endif // NTP_MANAGER_H
