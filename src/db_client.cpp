@@ -2,7 +2,7 @@
 #include "wifi_manager.h"
 
 // Database connection details
-const char* DB_HOST = "rafitirafabioorchitrinajohannantuck.stegripe.org";
+const char* DB_HOST = "rafitirafabioorchitrinajohanaxura.stegripe.org";
 const char* DB_USER = "root";
 const char* DB_PASS = "Nc7gcfZiIt0fssZn5FvlbOrFGWTUS9xoQaxOLJ60EgpPyD4I6Y";
 
