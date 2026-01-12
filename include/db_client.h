@@ -9,7 +9,7 @@
 
 // Database connection details
 extern const char* DB_HOST;
-#define DB_PORT 2017
+#define DB_PORT 2016
 extern const char* DB_USER;
 extern const char* DB_PASS;
 

@@ -119,7 +119,7 @@ static void fillJsonDocument(JsonDocument& doc) {
   for (const Admin& a : daftarAdminData) {
     JsonObject obj = admins.add<JsonObject>();
     obj["nama"] = a.nama;
-    obj["nik"] = a.nik;
+    obj["nim"] = a.nim;
     obj["email"] = a.email;
     obj["id"] = a.sidikJariID;
   }

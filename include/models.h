@@ -25,12 +25,12 @@ struct Mahasiswa {
 
 struct Admin {
   String nama;
-  String nik;
+  String nim;
   String email;
   String password;
   uint16_t sidikJariID;
 
-  Admin() : nama(), nik(), email(), password(), sidikJariID(0) {}
+  Admin() : nama(), nim(), email(), password(), sidikJariID(0) {}
 };
 
 struct FingerprintRecord {

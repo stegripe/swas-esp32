@@ -16,5 +16,5 @@ void handleInputFormAdmin(char key);
 
 // ✅ Tambahan untuk fitur edit Admin
 void mulaiEditAdmin();                  // Mulai proses edit data admin setelah verifikasi berhasil
-void tampilkanFormEditAdmin();          // Tampilkan form edit data admin (nama, nik)
+void tampilkanFormEditAdmin();          // Tampilkan form edit data admin (nama, nim)
 void handleInputEditAdmin(char key);    // Tangani input perubahan data admin

@@ -284,16 +284,16 @@ void AdvancedGUI::showMainMenu() {
     clearMenu();
     
     addMenuItem("Check In", "clock", []() {
-        currentState = ABSEN;
         Serial.println("Check In selected");
-        // Show attendance screen for check in
+        // Initialize check in process - main loop will handle the rest
+        tampilkanMenuAbsenMasuk();
         showAttendanceScreen();
     }, COLOR_SUCCESS);
     
     addMenuItem("Check Out", "clock", []() {
-        currentState = ABSEN;
         Serial.println("Check Out selected");
-        // Show attendance screen for check out
+        // Initialize check out process - main loop will handle the rest
+        tampilkanMenuAbsenPulang();
         showAttendanceScreen();
     }, COLOR_WARNING);
     
@@ -680,7 +680,7 @@ void AdvancedGUI::showAdminRegistrationForm() {
     
     // Form fields
     drawFormField("Name:", admin.nama, 80, fieldIndex == 0);
-    drawFormField("NIK:", admin.nik, 100, fieldIndex == 1);
+    drawFormField("NIM:", admin.nim, 100, fieldIndex == 1);
     
     // Current input display
     tft.setTextSize(1);
@@ -982,7 +982,7 @@ bool AdvancedGUI::validateForm() {
     } else if (currentState == KONFIRMASI_ADMIN) {
         // Validate admin form
         return admin.nama.length() > 0 && 
-               admin.nik.length() > 0;
+               admin.nim.length() > 0;
     }
     return false;
 }

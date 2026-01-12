@@ -16,7 +16,7 @@ extern void handleAlfabetInput(char key);
 void tampilkanFormDataAdmin() {
   Serial.println("======= Pendaftaran Admin =======");
   Serial.print("Nama: "); Serial.println(admin.nama);
-  Serial.print("NIK : "); Serial.println(admin.nik);
+  Serial.print("NIM : "); Serial.println(admin.nim);
   Serial.println("=================================");
   if (fieldIndex < 2) {
     Serial.println("Masukkan data. Tekan '#' untuk lanjut, 'B' untuk kembali.");
@@ -43,7 +43,7 @@ void handleInputFormAdmin(char key) {
         // Create admin via API
         ApiUser apiUser;
         apiUser.nama = admin.nama;
-        apiUser.email = admin.nik + "@admin.default"; // Default email
+        apiUser.email = admin.nim + "@admin.default"; // Default email
         apiUser.password = "default123"; // Default password
         apiUser.isAdmin = 1;
         apiUser.isDosen = 0;
@@ -74,8 +74,8 @@ void handleInputFormAdmin(char key) {
       }
     } else if (key == 'B') {
       fieldIndex = 1;
-      currentAdminField = &admin.nik;
-      inputText = admin.nik;
+      currentAdminField = &admin.nim;
+      inputText = admin.nim;
       currentState = ISI_DATA_ADMIN;
       modeAlfabet = true;
       tampilkanFormDataAdmin();
@@ -124,7 +124,7 @@ void handleInputFormAdmin(char key) {
       return;
     }
     if (fieldIndex == 1) {
-      admin.nik = "";
+      admin.nim = "";
     }
     fieldIndex--;
     if (fieldIndex == 0) {
@@ -142,7 +142,7 @@ void handleInputFormAdmin(char key) {
     inputText = "";
     fieldIndex++;
     if (fieldIndex == 1) {
-      currentAdminField = &admin.nik;
+      currentAdminField = &admin.nim;
     } else {
       currentState = KONFIRMASI_ADMIN;
     }
@@ -161,7 +161,7 @@ void handleInputFormAdmin(char key) {
 void tampilkanFormEditAdmin() {
   Serial.println("======= Ganti Data Admin ========");
   Serial.print("Nama: "); Serial.println(admin.nama);
-  Serial.print("NIK : "); Serial.println(admin.nik);
+  Serial.print("NIM : "); Serial.println(admin.nim);
   Serial.println("=================================");
   if (fieldIndex < 2) {
     Serial.println("Masukkan data baru. Tekan '#' untuk lanjut, 'B' untuk kembali.");
@@ -185,7 +185,7 @@ void handleInputEditAdmin(char key) {
       // Update admin via API
       ApiUser apiUser;
       apiUser.nama = admin.nama;
-      apiUser.email = admin.nik + "@admin.default"; // Default email
+      apiUser.email = admin.nim + "@admin.default"; // Default email
       apiUser.password = "default123"; // Default password
       apiUser.isAdmin = 1;
       apiUser.isDosen = 0;
@@ -219,8 +219,8 @@ void handleInputEditAdmin(char key) {
 
     if (key == 'B') {
       fieldIndex = 1;
-      currentAdminField = &admin.nik;
-      inputText = admin.nik;
+      currentAdminField = &admin.nim;
+      inputText = admin.nim;
       currentState = EDIT_DATA_ADMIN;
       tampilkanFormEditAdmin();
       return;
@@ -265,7 +265,7 @@ void handleInputEditAdmin(char key) {
       return;
     }
     if (fieldIndex == 1) {
-      admin.nik = "";
+      admin.nim = "";
       fieldIndex = 0;
       currentAdminField = &admin.nama;
       inputText = admin.nama;
@@ -279,7 +279,7 @@ void handleInputEditAdmin(char key) {
     *currentAdminField = inputText;
     inputText = "";
     fieldIndex++;
-    if (fieldIndex == 1) currentAdminField = &admin.nik;
+    if (fieldIndex == 1) currentAdminField = &admin.nim;
     else currentState = KONFIRMASI_EDIT_ADMIN;
     tampilkanFormEditAdmin();
     return;
